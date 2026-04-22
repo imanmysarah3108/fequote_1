@@ -1,10 +1,16 @@
-from google import genai
 from PIL import Image
 import time
+import os
+from dotenv import load_dotenv
+import google.generativeai as genai
 
-client = genai.Client(api_key="YOUR_API_KEY_HERE")
+load_dotenv()
 
-MODEL_NAME = "gemini-2.5-flash"
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+genai.configure(api_key=API_KEY)
+
+client = genai.GenerativeModel("gemini-2.5-flash")
 
 
 def detect_emotion(image_path):
@@ -29,11 +35,7 @@ Rules:
 
     for attempt in range(3):
         try:
-            response = client.models.generate_content(
-                model=MODEL_NAME,
-                contents=[prompt, img]
-            )
-
+            response = client.generate_content([prompt, img])
             result = response.text.strip().lower()
 
             # Normalize result
@@ -59,7 +61,7 @@ Rules:
 
 # Test
 if __name__ == "__main__":
-    image_path = "test_images/angry.jpg"
+    image_path = "dataset/test_images/angry.jpg"
 
     result = detect_emotion(image_path)
 
