@@ -6,7 +6,7 @@ class ApiService {
   static Future<String> detectEmotion(File imageFile) async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.137.1:8000/detect-emotion/'),
+      Uri.parse('http://10.62.49.84:8000/analyze'),
     );
 
     request.files.add(
