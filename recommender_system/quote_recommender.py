@@ -12,18 +12,26 @@ current_dir = os.path.dirname(__file__)
 csv_path = os.path.abspath(os.path.join(current_dir, "../dataset/emotion_quotes.csv"))
 embedding_path = os.path.abspath(os.path.join(current_dir, "quote_embeddings.npy"))
 
-# Load dataset
-data = pd.read_csv(csv_path)
+data = None
+embeddings = None
+model = None
 
-# Load embeddings
-embeddings = np.load(embedding_path)
 
-# Load SBERT model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+def load_resources():
+    global data, embeddings, model
+
+    if data is None:
+        data = pd.read_csv(csv_path)
+
+    if embeddings is None:
+        embeddings = np.load(embedding_path)
+
+    if model is None:
+        model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
 def recommend_quotes(emotion, top_n=5):
-
+    load_resources()
     # Filter indices based on emotion
     indices = data[data['emotion'] == emotion].index.tolist()
 

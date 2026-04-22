@@ -8,13 +8,23 @@ load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
-genai.configure(api_key=API_KEY)
+client = None
 
-client = genai.GenerativeModel("gemini-2.5-flash")
+
+def get_client():
+    global client
+
+    if client is None:
+        if not API_KEY:
+            raise ValueError("GEMINI_API_KEY not found")
+
+        genai.configure(api_key=API_KEY)
+        client = genai.GenerativeModel("gemini-2.5-flash")
+
+    return client
 
 
 def detect_emotion(image_path):
-
     img = Image.open(image_path)
 
     prompt = """
@@ -27,18 +37,15 @@ happy, sad, angry, surprise
 
 If you are NOT confident or no clear face/emotion is visible:
 return exactly: no emotion
-
-Rules:
-- Only ONE answer
-- No explanation
 """
+
+    client = get_client()
 
     for attempt in range(3):
         try:
             response = client.generate_content([prompt, img])
             result = response.text.strip().lower()
 
-            # Normalize result
             if "happy" in result:
                 return "happy"
             elif "sad" in result:
@@ -47,22 +54,11 @@ Rules:
                 return "angry"
             elif "surprise" in result:
                 return "surprise"
-            elif "no emotion" in result:
-                return "no emotion detected, try again"
             else:
-                return "no emotion detected, try again"
+                return "no emotion detected"
 
         except Exception as e:
             print(f"Retry {attempt+1}:", e)
             time.sleep(2)
 
-    return "no emotion detected, try again"
-
-
-# Test
-if __name__ == "__main__":
-    image_path = "dataset/test_images/angry.jpg"
-
-    result = detect_emotion(image_path)
-
-    print("\nDetected Emotion:", result)
+    return "no emotion detected"
