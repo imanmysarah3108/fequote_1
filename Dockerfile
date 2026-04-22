@@ -15,4 +15,4 @@ COPY . .
 # Preload SBERT model (important for performance)
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
 
-CMD ["uvicorn", "api_server:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD uvicorn api_server:app --host 0.0.0.0 --port ${PORT:-8080}
