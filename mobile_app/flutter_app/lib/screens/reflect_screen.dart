@@ -1,7 +1,6 @@
-
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 import '../services/api_service.dart';
 import 'result_screen.dart';
 
@@ -14,190 +13,164 @@ class ReflectScreen extends StatefulWidget {
 
 class _ReflectScreenState extends State<ReflectScreen> {
   CameraController? _controller;
-  Future<void>? _initializeCameraFuture;
+  List<CameraDescription>? cameras;
+  int cameraIndex = 0;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    initializeCamera();
+    _initCamera();
   }
 
-  Future<void> initializeCamera() async {
-    final cameras = await availableCameras();
-
-    final frontCamera = cameras.firstWhere(
-      (camera) => camera.lensDirection == CameraLensDirection.front,
-    );
+  Future<void> _initCamera() async {
+    cameras = await availableCameras();
 
     _controller = CameraController(
-      frontCamera,
+      cameras![cameraIndex],
       ResolutionPreset.medium,
     );
 
-    _initializeCameraFuture = _controller!.initialize();
+    await _controller!.initialize();
+
+    if (mounted) setState(() {});
+  }
+
+  // 🔄 Switch front/back camera
+  Future<void> _switchCamera() async {
+    if (cameras == null || cameras!.isEmpty) return;
+
+    cameraIndex = (cameraIndex + 1) % cameras!.length;
+
+    _controller = CameraController(
+      cameras![cameraIndex],
+      ResolutionPreset.medium,
+    );
+
+    await _controller!.initialize();
 
     setState(() {});
+  }
+
+  // 📸 Capture + Send
+  Future<void> _captureAndSend() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final image = await _controller!.takePicture();
+
+      print("📸 IMAGE PATH: ${image.path}");
+
+      File imageFile = File(image.path);
+
+      var result = await ApiService.detectEmotion(imageFile);
+
+      String emotion = result['emotion'];
+      List<String> quotes = result['quotes'];
+
+      print("🧠 EMOTION: $emotion");
+
+      setState(() {
+        isLoading = false;
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(
+            emotion: emotion,
+            quotes: quotes,
+          ),
+        ),
+      );
+    } catch (e) {
+      print("❌ ERROR: $e");
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _controller == null || !_controller!.value.isInitialized
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                // 📷 Camera Preview
+                Positioned.fill(
+                  child: CameraPreview(_controller!),
+                ),
+
+                // 🔄 Flip Camera Button
+                Positioned(
+                  top: 50,
+                  right: 20,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black54,
+                    child: IconButton(
+                      icon: const Icon(Icons.flip_camera_ios,
+                          color: Colors.white),
+                      onPressed: _switchCamera,
+                    ),
+                  ),
+                ),
+
+                // ⏳ Loading overlay
+                if (isLoading)
+                  Container(
+                    color: Colors.black45,
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    ),
+                  ),
+
+                // 🎯 Bottom Controls
+                Positioned(
+                  bottom: 40,
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Capture your emotion",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      GestureDetector(
+                        onTap: isLoading ? null : _captureAndSend,
+                        child: Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 4,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
   }
 
   @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(25),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFFFE5D9),
-              Color(0xFFFFF7F3),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-
-        child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-
-              const Text(
-                "Moment of Reflection",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              const Text(
-                "Position your face and relax.\nLet the system understand your emotion.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 16,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              /// CAMERA CARD (GLASS STYLE)
-              Expanded(
-                child: FutureBuilder(
-                  future: _initializeCameraFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.orange.withValues(alpha: 0.15),
-                              blurRadius: 25,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Stack(
-                            children: [
-                              CameraPreview(_controller!),
-
-                              /// Glass overlay
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              /// PREMIUM BUTTON
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFFFC1A1),
-                      Color(0xFFFF8A65),
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.orange.withValues(alpha: 0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    minimumSize: const Size(double.infinity, 60),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: () async {
-                    try {
-                      final image = await _controller!.takePicture();
-
-                      File imageFile = File(image.path);
-
-                      String emotion = await ApiService.detectEmotion(imageFile);
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ResultScreen(emotion: emotion),
-                        ),
-                      );
-                    } catch (e) {
-                      print("Error: $e");
-                    }
-                  },
-
-                  child: const Text(
-                    "Detect Emotion",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
