@@ -1,10 +1,13 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Prevent Python from writing .pyc files
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# 🔥 install system dependencies (IMPORTANT for ML libs)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libglib2.0-0 \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 
@@ -12,7 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Preload SBERT model (important for performance)
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+ENV PORT=8080
 
-CMD uvicorn api_server:app --host 0.0.0.0 --port ${PORT:-8080}
+CMD ["uvicorn", "api_server:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,7 +1,10 @@
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
 venv/
+*.pyc
+.env
+dataset/
+notebooks/
+mobile_app/
 .git
+temp/
+model/

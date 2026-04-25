@@ -43,3 +43,9 @@ async def analyze(image: UploadFile = File(...)):
 
     except Exception as e:
         return {"error": str(e)}
+    
+# your existing code stays the same...
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("api_server:app", host="0.0.0.0", port=8080)
