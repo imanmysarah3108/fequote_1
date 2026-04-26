@@ -1,9 +1,3 @@
-import sys
-import os
-
-# Add root project folder to Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from dataset.fer_gemini import detect_emotion
 from recommender_system.quote_recommender import recommend_quotes
 def run_pipeline(image_path):

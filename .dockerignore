@@ -2,7 +2,6 @@ __pycache__/
 venv/
 *.pyc
 .env
-dataset/
 notebooks/
 mobile_app/
 .git
