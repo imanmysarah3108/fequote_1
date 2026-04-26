@@ -7,7 +7,7 @@ class ApiService {
   try {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://10.62.74.184:8000/analyze'),
+      Uri.parse('https://fequote-api-155804644015.asia-southeast1.run.app/analyze'),
     );
 
     request.files.add(
