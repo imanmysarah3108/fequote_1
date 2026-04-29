@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../constants/app_theme.dart';
+import 'quote_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final String emotion;
@@ -14,93 +16,128 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // 🌈 Soft gradient background
+        width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF667EEA),
-              Color(0xFF764BA2),
+              Color(0xFFFFF7F3), // Creamy background
+              Color(0xFFFFE5D9), // Soft peach
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-
-              // 🧠 Emotion Title
-              Text(
-                emotion.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2,
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // 🎴 Quote Slider
-              Expanded(
-                child: PageView.builder(
-                  itemCount: quotes.length,
-                  controller: PageController(viewportFraction: 0.85),
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(25),
-                        child: Center(
-                          child: Text(
-                            quotes[index],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              height: 1.5,
-                              color: Colors.black87,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(),
+                
+                // Premium Glowing Circle Graphic
+                Container(
+                  height: 220,
+                  width: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFC1A1), Color(0xFFFF8A65)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF8A65).withValues(alpha: 0.3),
+                        blurRadius: 40,
+                        spreadRadius: 10,
+                        offset: const Offset(0, 10),
                       ),
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // 🔙 Back Button
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                    ],
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      width: 2,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Reflect Again"),
+                  child: Center(
+                    child: Icon(
+                      Icons.self_improvement_rounded,
+                      size: 80,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 50),
+                
+                Text(
+                  "You seem a bit",
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppTheme.darkText.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  emotion.toUpperCase(),
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: AppTheme.primary,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  "We've analyzed your expression. Let's take a deep breath and find a moment of peace through words.",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                
+                const Spacer(),
+
+                // Pill Button to reveal quotes
+                Container(
+                  margin: const EdgeInsets.only(bottom: 40),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primary.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 65),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => QuoteScreen(
+                            emotion: emotion,
+                            quotes: quotes,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Reveal My Quotes",
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.0,
+                          ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

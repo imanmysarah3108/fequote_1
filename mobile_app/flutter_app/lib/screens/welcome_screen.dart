@@ -10,84 +10,115 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 30),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFFFE5D9),
-              Color(0xFFFFF7F3),
+              Color(0xFFFFF9F6), // Creamy beige
+              Color(0xFFFFE5D9), // Soft peach
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Reflect Your\nMood",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-
-            const SizedBox(height: 20),
-
-            Text(
-              "Scan your face. Get inspired by quotes that match your emotion.",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-
-            const SizedBox(height: 60),
-
-            Container(
-              height: 220,
-              width: 220,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(110),
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFFFC1A1),
-                    Color(0xFFFF8A65),
-                  ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(),
+                Text(
+                  "Reflect Your\nMood",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineLarge,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.withOpacity(0.3),
-                    blurRadius: 25,
-                    spreadRadius: 5,
-                  )
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 60),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                minimumSize: const Size(double.infinity, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                const SizedBox(height: 15),
+                Text(
+                  "Scan your face. Get inspired by quotes that match your emotion.",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
-              ),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ReflectScreen(),
+                const SizedBox(height: 60),
+
+                // Premium Glassmorphic / Soft Glow Element
+                Container(
+                  height: 240,
+                  width: 240,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xFFFFC1A1),
+                        Color(0xFFFF8A65),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF8A65).withValues(alpha: 0.25),
+                        blurRadius: 40,
+                        spreadRadius: 10,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      width: 2,
+                    ),
                   ),
-                );
-              },
-              child: const Text(
-                "GET STARTED",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                  child: Center(
+                    child: Icon(
+                      Icons.self_improvement_rounded,
+                      size: 80,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
                 ),
-              ),
-            )
-          ],
+                const Spacer(),
+
+                // Pill-shaped Button
+                Container(
+                  margin: const EdgeInsets.only(bottom: 40),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primary.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 65),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ReflectScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "GET STARTED",
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: Colors.white,
+                          ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
