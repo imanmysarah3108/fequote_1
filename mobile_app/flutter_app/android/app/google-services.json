@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "155804644015",
+    "project_id": "fyp-motivational-app",
+    "storage_bucket": "fyp-motivational-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155804644015:android:99fcc69f6689599676da5a",
+        "android_client_info": {
+          "package_name": "com.example.flutter_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoNdhN7Xi3PcbSVIHEr4LWTjjZ4ySLtiE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
