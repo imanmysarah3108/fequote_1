@@ -2,35 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFFFF8A65); // Blush Orange
-  static const Color secondary = Color(0xFFFFC1A1); // Pastel Peach
-  static const Color accent = Color(0xFFFFE5D9); // Soft Coral/Beige
-  static const Color darkText = Color(0xFF4A3F35); // Soft earthy dark tone
-  static const Color lightBg = Color(0xFFFFF9F6); // Creamy background
+  // New Brand Colors
+  static const Color primaryPurple = Color(0xFF9E8BFF);
+  static const Color primaryPeach = Color(0xFFFFB09C);
+  static const Color darkText = Color(0xFF4A3F35);
+  static const Color lightBg = Color(0xFFFFF9F6);
+
+  // Standard Background Gradient
+  static const BoxDecoration backgroundGradient = BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [primaryPurple, primaryPeach],
+    ),
+  );
 
   static ThemeData lightTheme = ThemeData(
-    scaffoldBackgroundColor: lightBg,
-    primaryColor: primary,
+    scaffoldBackgroundColor: Colors.transparent, // Handled by container gradients
+    primaryColor: primaryPurple,
     textTheme: TextTheme(
       headlineLarge: GoogleFonts.playfairDisplay(
         fontSize: 36,
         fontWeight: FontWeight.w700,
-        color: darkText,
+        color: Colors.white,
         letterSpacing: 0.5,
       ),
       headlineMedium: GoogleFonts.playfairDisplay(
         fontSize: 28,
         fontWeight: FontWeight.w600,
-        color: darkText,
+        color: Colors.white,
       ),
       bodyLarge: GoogleFonts.poppins(
         fontSize: 16,
-        color: darkText.withValues(alpha: 0.8),
+        color: Colors.white.withValues(alpha: 0.9),
         height: 1.5,
       ),
       bodyMedium: GoogleFonts.poppins(
         fontSize: 14,
-        color: darkText.withValues(alpha: 0.6),
+        color: Colors.white.withValues(alpha: 0.7),
       ),
       labelLarge: GoogleFonts.poppins(
         fontSize: 16,

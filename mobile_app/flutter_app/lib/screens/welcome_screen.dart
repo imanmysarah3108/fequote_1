@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../constants/app_theme.dart';
 import 'reflect_screen.dart';
 import 'settings_screen.dart';
@@ -8,100 +9,75 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      body: Stack( // ✅ ADDED (to overlay button)
+      body: Stack(
         children: [
+          // Background Gradient
           Container(
             width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFFFF9F6),
-                  Color(0xFFFFE5D9),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            height: double.infinity,
+            decoration: AppTheme.backgroundGradient,
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Spacer(),
+                    const Spacer(flex: 2),
+                    
+                    // UI Match: "Quote" Title
                     Text(
-                      "Reflect Your\nMood",
+                      "Quote",
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
-                    const SizedBox(height: 15),
-                    Text(
-                      "Scan your face. Get inspired by quotes that match your emotion.",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 60),
-
-                    Container(
-                      height: 240,
-                      width: 240,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFFC1A1),
-                            Color(0xFFFF8A65),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFF8A65).withValues(alpha: 0.25),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          width: 2,
-                        ),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.self_improvement_rounded,
-                          size: 80,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
+                      style: textTheme.headlineLarge?.copyWith(
+                        fontSize: 52, // Scaled up to match the reference
                       ),
                     ),
-                    const Spacer(),
+                    
+                    // UI Match: "My Mood" Subtitle
+                    Text(
+                      "My Mood",
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodyLarge?.copyWith(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w300, // Light weight for elegant contrast
+                      ),
+                    ),
+                    
+                    const Spacer(flex: 1),
 
+                    // YOUR CUSTOM BIG LOGO
+                    // Ensure the path matches exactly what is in pubspec.yaml
+                    Image.asset(
+                      'assets/images/app_logo.png',
+                      width: 280, // Large size to match the reference
+                      height: 280,
+                      fit: BoxFit.contain,
+                    ),
+                    
+                    const Spacer(flex: 2),
+
+                    // Glassmorphic 'Get Started' Button
                     Container(
                       margin: const EdgeInsets.only(bottom: 40),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(40),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primary.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
                           foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 65),
+                          minimumSize: const Size(double.infinity, 60),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40),
+                            borderRadius: BorderRadius.circular(30),
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.4), 
+                              width: 1.5,
+                            ),
                           ),
                         ),
                         onPressed: () {
+                          // Preserved routing logic
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -110,10 +86,12 @@ class WelcomeScreen extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          "GET STARTED",
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                color: Colors.white,
-                              ),
+                          "Get Started",
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
@@ -123,21 +101,37 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
 
-          // ✅ ONLY ADDITION: SETTINGS BUTTON
+          // Top Right Settings Button (Glass Pill)
           Positioned(
-            top: 20,
-            right: 20,
-            child: SafeArea(
-              child: IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SettingsScreen(),
-                    ),
-                  );
-                },
+            top: 50, // Standard safe area padding
+            right: 24,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+                  ),
+                  child: IconButton(
+                    // UI Match: Using toggle_on to match your design visually 
+                    // while keeping it functioning as the settings button
+                    icon: const Icon(Icons.toggle_on, color: Colors.white, size: 28),
+                    onPressed: () {
+                      // Preserved routing logic
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),

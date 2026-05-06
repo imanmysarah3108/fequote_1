@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'home_screen.dart';
 import 'reflect_screen.dart';
 import 'quote_screen.dart';
 import 'settings_screen.dart';
@@ -16,18 +15,21 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int currentIndex = 0;
 
-final List<Widget> screens = const [
-    HomeScreen(),
-    ReflectScreen(),
-    QuoteScreen(emotion: "Peaceful", quotes: []), // <--- To this
-    SettingsScreen(),
-];
+  final List<Widget> screens = const [
+      ReflectScreen(),
+      QuoteScreen(emotion: "Peaceful", quotes: []), 
+      SettingsScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: screens[currentIndex],
+      extendBodyBehindAppBar: true,
       extendBody: true,
+      body: Container(
+        decoration: AppTheme.backgroundGradient,
+        child: screens[currentIndex]
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 30),
         child: ClipRRect(
@@ -37,15 +39,15 @@ final List<Widget> screens = const [
             child: Container(
               height: 75,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.6),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(40),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: Colors.white.withValues(alpha: 0.4),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.darkText.withValues(alpha: 0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -54,10 +56,9 @@ final List<Widget> screens = const [
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  navItem(Icons.home_rounded, 0),
-                  navItem(Icons.camera_alt_rounded, 1),
-                  navItem(Icons.format_quote_rounded, 2),
-                  navItem(Icons.settings_rounded, 3),
+                  navItem(Icons.camera_alt_rounded, 0),
+                  navItem(Icons.format_quote_rounded, 1),
+                  navItem(Icons.settings_rounded, 2),
                 ],
               ),
             ),
@@ -82,12 +83,12 @@ final List<Widget> screens = const [
         curve: Curves.easeOutQuint,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.secondary.withValues(alpha: 0.5) : Colors.transparent,
+          color: isSelected ? Colors.white.withValues(alpha: 0.25) : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Icon(
           icon,
-          color: isSelected ? AppTheme.primary : AppTheme.darkText.withValues(alpha: 0.4),
+          color: isSelected ? Colors.white : Colors.white60,
           size: 28,
         ),
       ),
