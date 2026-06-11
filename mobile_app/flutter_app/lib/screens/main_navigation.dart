@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:ui';
 import 'reflect_screen.dart';
 import 'quote_screen.dart';
 import 'settings_screen.dart';
 import '../constants/app_theme.dart';
+import '../providers/navigation_provider.dart';
 
-class MainNavigation extends StatefulWidget {
+class MainNavigation extends StatelessWidget {
   const MainNavigation({super.key});
 
   @override
-  State<MainNavigation> createState() => _MainNavigationState();
-}
-
-class _MainNavigationState extends State<MainNavigation> {
-  int currentIndex = 0;
-
-  final List<Widget> screens = const [
-      ReflectScreen(),
-      QuoteScreen(emotion: "Peaceful", quotes: []), 
-      SettingsScreen(),
-  ];
-
-  @override
   Widget build(BuildContext context) {
+    final navigation = context.watch<NavigationProvider>();
+
+    final screens = const [
+      ReflectScreen(),
+      QuoteScreen(),
+      SettingsScreen(),
+    ];
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
       body: Container(
         decoration: AppTheme.backgroundGradient,
-        child: screens[currentIndex]
+        child: screens[navigation.currentIndex],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 30),
@@ -56,9 +53,9 @@ class _MainNavigationState extends State<MainNavigation> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  navItem(Icons.camera_alt_rounded, 0),
-                  navItem(Icons.format_quote_rounded, 1),
-                  navItem(Icons.settings_rounded, 2),
+                  _navItem(context, Icons.camera_alt_rounded, 0),
+                  _navItem(context, Icons.format_quote_rounded, 1),
+                  _navItem(context, Icons.settings_rounded, 2),
                 ],
               ),
             ),
@@ -68,15 +65,12 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  Widget navItem(IconData icon, int index) {
-    bool isSelected = currentIndex == index;
+  Widget _navItem(BuildContext context, IconData icon, int index) {
+    final navigation = context.watch<NavigationProvider>();
+    final isSelected = navigation.currentIndex == index;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          currentIndex = index;
-        });
-      },
+      onTap: () => context.read<NavigationProvider>().setIndex(index),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),

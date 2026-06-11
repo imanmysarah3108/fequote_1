@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_theme.dart';
+import '../providers/reflect_provider.dart';
+import '../providers/quote_provider.dart';
 import 'result_screen.dart';
 
 class ReflectScreen extends StatefulWidget {
@@ -17,8 +19,7 @@ class _ReflectScreenState extends State<ReflectScreen> {
   CameraController? _controller;
   List<CameraDescription>? cameras;
   int cameraIndex = 0;
-  bool isLoading = false;
-  bool isPressed = false; // For button animation
+  bool isPressed = false;
 
   @override
   void initState() {
@@ -44,38 +45,28 @@ class _ReflectScreenState extends State<ReflectScreen> {
       ResolutionPreset.medium,
     );
     await _controller!.initialize();
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   Future<void> _captureAndSend() async {
-    try {
-      setState(() => isLoading = true);
+    final reflectProvider = context.read<ReflectProvider>();
+    final quoteProvider = context.read<QuoteProvider>();
 
-      final image = await _controller!.takePicture();
-      File imageFile = File(image.path);
-      var result = await ApiService.detectEmotion(imageFile);
+    final image = await _controller!.takePicture();
+    final result = await reflectProvider.captureAndDetect(File(image.path));
 
-      String emotion = result['emotion'];
-      List<String> quotes = result['quotes'];
-
-      setState(() => isLoading = false);
-
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ResultScreen(emotion: emotion, quotes: quotes),
-          ),
-        );
-      }
-    } catch (e) {
-      print("❌ ERROR: $e");
-      setState(() => isLoading = false);
+    if (result != null && mounted) {
+      reflectProvider.updateQuoteFromResult(quoteProvider, result);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ResultScreen()),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<ReflectProvider>().isLoading;
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -90,7 +81,6 @@ class _ReflectScreenState extends State<ReflectScreen> {
                 SafeArea(
                   child: Column(
                     children: [
-                      // Top Right Toggle (Flip Camera)
                       Align(
                         alignment: Alignment.centerRight,
                         child: Padding(
@@ -116,18 +106,15 @@ class _ReflectScreenState extends State<ReflectScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 10),
-                      Text("Moment of Reflection", style: textTheme.headlineMedium),
+                      Text('Moment of Reflection', style: textTheme.headlineMedium),
                       const SizedBox(height: 12),
                       Text(
-                        "Position your face in the frame.\nRelax and breathe.",
+                        'Position your face in the frame.\nRelax and breathe.',
                         textAlign: TextAlign.center,
                         style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300),
                       ),
                       const SizedBox(height: 40),
-
-                      // Large Glass Camera Frame
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -154,8 +141,6 @@ class _ReflectScreenState extends State<ReflectScreen> {
                           ),
                         ),
                       ),
-
-                      // Animated Glass Capture Button
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 40),
                         child: GestureDetector(
@@ -167,7 +152,11 @@ class _ReflectScreenState extends State<ReflectScreen> {
                           onTapCancel: () => setState(() => isPressed = false),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
-                            transform: Matrix4.diagonal3Values(isPressed ? 0.9 : 1.0, isPressed ? 0.9 : 1.0, 1.0),
+                            transform: Matrix4.diagonal3Values(
+                              isPressed ? 0.9 : 1.0,
+                              isPressed ? 0.9 : 1.0,
+                              1.0,
+                            ),
                             alignment: Alignment.center,
                             width: 80,
                             height: 80,
@@ -183,8 +172,6 @@ class _ReflectScreenState extends State<ReflectScreen> {
                     ],
                   ),
                 ),
-
-                // Loading Overlay
                 if (isLoading)
                   Positioned.fill(
                     child: BackdropFilter(

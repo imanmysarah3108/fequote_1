@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../constants/app_theme.dart';
+import '../providers/quote_provider.dart';
+import '../providers/navigation_provider.dart';
 import 'quote_screen.dart';
 
 class ResultScreen extends StatelessWidget {
-  final String emotion;
-  final List<String> quotes;
-
-  const ResultScreen({
-    super.key,
-    required this.emotion,
-    required this.quotes,
-  });
+  const ResultScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final quote = context.watch<QuoteProvider>();
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -27,7 +24,6 @@ class ResultScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Top Right Toggle (Visual Match)
                 Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
@@ -50,12 +46,12 @@ class ResultScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                
                 const Spacer(),
-                Text("You seem a bit", style: textTheme.bodyLarge?.copyWith(fontSize: 22, fontWeight: FontWeight.w300)),
+                Text(
+                  'You seem a bit',
+                  style: textTheme.bodyLarge?.copyWith(fontSize: 22, fontWeight: FontWeight.w300),
+                ),
                 const SizedBox(height: 40),
-
-                // Giant Glass Circle
                 ClipOval(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -76,14 +72,13 @@ class ResultScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          emotion.toLowerCase(),
+                          quote.emotion.toLowerCase(),
                           style: textTheme.headlineLarge?.copyWith(fontSize: 40),
                         ),
                       ),
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 50),
                 Text(
                   "We've analyzed your expression.\nLet's take a deep breath and find a\nmoment of peace through words.",
@@ -91,8 +86,6 @@ class ResultScreen extends StatelessWidget {
                   style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300, fontSize: 16),
                 ),
                 const Spacer(),
-
-                // Glass Pill Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white.withValues(alpha: 0.25),
@@ -105,25 +98,22 @@ class ResultScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
+                    context.read<NavigationProvider>().setIndex(1);
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => QuoteScreen(emotion: emotion, quotes: quotes),
-                      ),
+                      MaterialPageRoute(builder: (_) => const QuoteScreen()),
                     );
                   },
                   child: Text(
-                    "Find My Quote",
+                    'Find My Quote',
                     style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Scan Again Text Button
                 GestureDetector(
                   onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
                   child: Text(
-                    "Scan Again",
+                    'Scan Again',
                     style: textTheme.bodyLarge?.copyWith(
                       decoration: TextDecoration.underline,
                       decorationColor: Colors.white,
