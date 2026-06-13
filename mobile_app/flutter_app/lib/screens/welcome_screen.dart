@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../constants/app_theme.dart';
+import '../app_routes.dart';
 import 'reflect_screen.dart';
 import 'settings_screen.dart';
 
@@ -58,6 +59,36 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                     
                     const Spacer(flex: 2),
+
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withValues(alpha: 0.15),
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 56),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.4),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, AppRoutes.moodDashboard);
+                        },
+                        child: Text(
+                          'My Mood Dashboard',
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
 
                     // Glassmorphic 'Get Started' Button
                     Container(

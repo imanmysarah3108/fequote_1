@@ -3,38 +3,45 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static Future<Map<String, dynamic>> detectEmotion(File imageFile) async {
-    try {
-      print("🚀 Sending request to API...");
-      print("📸 Image path: ${imageFile.path}");
+  static const String baseUrl =
+      'https://fequote-api-155804644015.asia-southeast1.run.app';
 
-      var request = http.MultipartRequest(
+  static Future<Map<String, dynamic>> detectEmotion(
+    File imageFile, {
+    String? deviceId,
+  }) async {
+    try {
+      final request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://fequote-api-155804644015.asia-southeast1.run.app/analyze'),
+        Uri.parse('$baseUrl/analyze'),
       );
 
       request.files.add(
         await http.MultipartFile.fromPath('image', imageFile.path),
       );
 
-      var response = await request.send();
-      var responseData = await response.stream.bytesToString();
+      if (deviceId != null) {
+        request.fields['device_id'] = deviceId;
+      }
 
-      print("📡 Status Code: ${response.statusCode}");
-      print("📦 Response Body: $responseData");
+      final response = await request.send();
+      final responseData = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(responseData);
+        final jsonData = jsonDecode(responseData) as Map<String, dynamic>;
+        if (jsonData.containsKey('error')) {
+          throw Exception(jsonData['error'] as String);
+        }
 
         return {
-          "emotion": jsonData["emotion"],
-          "quotes": List<String>.from(jsonData["quotes"]),
+          'emotion': jsonData['emotion'],
+          'confidence': (jsonData['confidence'] as num?)?.toDouble() ?? 0.0,
+          'quotes': List<String>.from(jsonData['quotes'] as List),
         };
-      } else {
-        throw Exception("Server error: $responseData");
       }
+
+      throw Exception('Server error: $responseData');
     } catch (e) {
-      print("❌ Exception: $e");
       rethrow;
     }
   }

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../constants/app_theme.dart';
 import '../providers/quote_provider.dart';
+import '../app_routes.dart';
+import '../widgets/gradient_button.dart';
 import 'settings_screen.dart';
 
 class QuoteScreen extends StatefulWidget {
@@ -14,6 +16,27 @@ class QuoteScreen extends StatefulWidget {
 
 class _QuoteScreenState extends State<QuoteScreen> {
   bool isButtonPressed = false;
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.85);
+    _pageController.addListener(_onPageChanged);
+  }
+
+  void _onPageChanged() {
+    if (!_pageController.hasClients) return;
+    final page = _pageController.page?.round() ?? 0;
+    context.read<QuoteProvider>().setSelectedQuoteIndex(page);
+  }
+
+  @override
+  void dispose() {
+    _pageController.removeListener(_onPageChanged);
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +97,28 @@ class _QuoteScreenState extends State<QuoteScreen> {
                 style: textTheme.headlineLarge?.copyWith(fontSize: 34),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: GradientButton(
+                  label: 'AI Rewrite',
+                  icon: Icons.auto_awesome,
+                  height: 48,
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.aiRewrite,
+                      arguments: quote.selectedQuote,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
               Expanded(
                 child: PageView.builder(
                   itemCount: displayQuotes.length,
                   physics: const BouncingScrollPhysics(),
-                  controller: PageController(viewportFraction: 0.85),
+                  controller: _pageController,
                   itemBuilder: (context, index) {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),

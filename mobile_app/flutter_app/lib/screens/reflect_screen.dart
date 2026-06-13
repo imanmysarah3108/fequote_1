@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../constants/app_theme.dart';
 import '../providers/reflect_provider.dart';
 import '../providers/quote_provider.dart';
+import '../providers/settings_provider.dart';
 import 'result_screen.dart';
 
 class ReflectScreen extends StatefulWidget {
@@ -51,9 +52,17 @@ class _ReflectScreenState extends State<ReflectScreen> {
   Future<void> _captureAndSend() async {
     final reflectProvider = context.read<ReflectProvider>();
     final quoteProvider = context.read<QuoteProvider>();
+    final settings = context.read<SettingsProvider>();
+
+    if (settings.deviceId == null) {
+      await settings.init();
+    }
 
     final image = await _controller!.takePicture();
-    final result = await reflectProvider.captureAndDetect(File(image.path));
+    final result = await reflectProvider.captureAndDetect(
+      File(image.path),
+      deviceId: settings.deviceId,
+    );
 
     if (result != null && mounted) {
       reflectProvider.updateQuoteFromResult(quoteProvider, result);

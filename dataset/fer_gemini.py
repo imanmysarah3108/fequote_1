@@ -1,7 +1,10 @@
 from PIL import Image
 import time
 import os
+from dotenv import load_dotenv
 import google.generativeai as genai
+
+load_dotenv()
 
 client = None
 
@@ -21,7 +24,26 @@ def get_client():
     return client
 
 
+def _map_emotion_result(result: str) -> dict:
+    normalized = result.strip().lower()
+
+    if "happy" in normalized:
+        return {"emotion": "happy", "confidence": 0.92}
+    if "sad" in normalized:
+        return {"emotion": "sad", "confidence": 0.88}
+    if "angry" in normalized:
+        return {"emotion": "angry", "confidence": 0.86}
+    if "surprise" in normalized:
+        return {"emotion": "surprise", "confidence": 0.90}
+
+    return {"emotion": "no emotion detected", "confidence": 0.0}
+
+
 def detect_emotion(image_path):
+    return detect_emotion_detailed(image_path)["emotion"]
+
+
+def detect_emotion_detailed(image_path):
     img = Image.open(image_path)
 
     prompt = """
@@ -42,20 +64,10 @@ return exactly: no emotion
         try:
             response = client.generate_content([prompt, img])
             result = response.text.strip().lower()
-
-            if "happy" in result:
-                return "happy"
-            elif "sad" in result:
-                return "sad"
-            elif "angry" in result:
-                return "angry"
-            elif "surprise" in result:
-                return "surprise"
-            else:
-                return "no emotion detected"
+            return _map_emotion_result(result)
 
         except Exception as e:
             print(f"Retry {attempt+1}:", e)
             time.sleep(2)
 
-    return "no emotion detected"
+    return {"emotion": "no emotion detected", "confidence": 0.0}
