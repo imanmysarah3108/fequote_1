@@ -20,110 +20,141 @@ class ResultScreen extends StatelessWidget {
         decoration: AppTheme.backgroundGradient,
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-                          ),
-                          child: const Icon(Icons.toggle_on, color: Colors.white, size: 28),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const Spacer(),
+                const Spacer(flex: 2),
                 Text(
                   'You seem a bit',
-                  style: textTheme.bodyLarge?.copyWith(fontSize: 22, fontWeight: FontWeight.w300),
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w300,
+                  ),
                 ),
-                const SizedBox(height: 40),
-                ClipOval(
+                const SizedBox(height: AppTheme.spaceLg),
+                _EmotionBubble(emotion: quote.emotion.toLowerCase()),
+                const SizedBox(height: AppTheme.spaceLg),
+                Text(
+                  "We've analyzed your expression. Let's take a deep breath and find a moment of peace through words.",
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w300,
+                    height: 1.45,
+                  ),
+                ),
+                const Spacer(flex: 2),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
-                      height: 260,
-                      width: 260,
+                      width: double.infinity,
+                      height: AppTheme.buttonHeight,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.15),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.45),
+                          width: 1,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            blurRadius: 30,
-                            spreadRadius: 5,
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: Center(
-                        child: Text(
-                          quote.emotion.toLowerCase(),
-                          style: textTheme.headlineLarge?.copyWith(fontSize: 40),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            context.read<NavigationProvider>().setIndex(1);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const QuoteScreen()),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                          child: Center(
+                            child: Text(
+                              'Find My Quote',
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 50),
-                Text(
-                  "We've analyzed your expression.\nLet's take a deep breath and find a\nmoment of peace through words.",
-                  textAlign: TextAlign.center,
-                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300, fontSize: 16),
-                ),
-                const Spacer(),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.25),
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 60),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
-                    ),
-                  ),
-                  onPressed: () {
-                    context.read<NavigationProvider>().setIndex(1);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const QuoteScreen()),
-                    );
-                  },
-                  child: Text(
-                    'Find My Quote',
-                    style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppTheme.spaceMd),
                 GestureDetector(
-                  onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
+                  onTap: () => Navigator.pop(context),
                   child: Text(
                     'Scan Again',
-                    style: textTheme.bodyLarge?.copyWith(
+                    style: textTheme.bodyMedium?.copyWith(
                       decoration: TextDecoration.underline,
                       decorationColor: Colors.white,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w300,
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: AppTheme.spaceXl),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmotionBubble extends StatelessWidget {
+  final String emotion;
+
+  const _EmotionBubble({required this.emotion});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      width: 200,
+      height: 200,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.35),
+            AppTheme.primaryPurple.withValues(alpha: 0.55),
+            AppTheme.primaryPurple.withValues(alpha: 0.75),
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryPurple.withValues(alpha: 0.35),
+            blurRadius: 40,
+            spreadRadius: 4,
+          ),
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(-6, -6),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.35),
+          width: 1.5,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          emotion,
+          style: textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

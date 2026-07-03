@@ -4,7 +4,8 @@ import 'dart:ui';
 import '../constants/app_theme.dart';
 import '../providers/quote_provider.dart';
 import '../app_routes.dart';
-import '../widgets/gradient_button.dart';
+import '../widgets/app_bottom_nav_bar.dart';
+import 'reflect_screen.dart';
 import 'settings_screen.dart';
 
 class QuoteScreen extends StatefulWidget {
@@ -15,20 +16,73 @@ class QuoteScreen extends StatefulWidget {
 }
 
 class _QuoteScreenState extends State<QuoteScreen> {
-  bool isButtonPressed = false;
   late final PageController _pageController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.85);
+    _pageController = PageController(viewportFraction: 0.78);
     _pageController.addListener(_onPageChanged);
   }
 
   void _onPageChanged() {
     if (!_pageController.hasClients) return;
     final page = _pageController.page?.round() ?? 0;
+    if (page != _currentIndex) {
+      setState(() => _currentIndex = page);
+    }
     context.read<QuoteProvider>().setSelectedQuoteIndex(page);
+  }
+
+  void _goToPrevious() {
+    if (!_pageController.hasClients) return;
+    final current = _pageController.page?.round() ?? 0;
+    if (current > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToNext() {
+    if (!_pageController.hasClients) return;
+    final quote = context.read<QuoteProvider>();
+    final count = quote.quotes.isEmpty ? 1 : quote.quotes.length;
+    final current = _pageController.page?.round() ?? 0;
+    if (current < count - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _goToDashboard() {
+    Navigator.pushNamed(context, AppRoutes.moodDashboard);
+  }
+
+  void _goToCamera() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ReflectScreen()),
+    );
+  }
+
+  void _goToSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
+  }
+
+  void _openAiRewrite(List<String> quotes) {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.aiRewrite,
+      arguments: quotes[_currentIndex],
+    );
   }
 
   @override
@@ -42,6 +96,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
   Widget build(BuildContext context) {
     final quote = context.watch<QuoteProvider>();
     final textTheme = Theme.of(context).textTheme;
+    final screenHeight = MediaQuery.sizeOf(context).height;
 
     final displayQuotes = quote.quotes.isEmpty
         ? ['Your motivational quote will appear here. You are stronger than you think.']
@@ -55,156 +110,248 @@ class _QuoteScreenState extends State<QuoteScreen> {
         width: double.infinity,
         decoration: AppTheme.backgroundGradient,
         child: SafeArea(
+          bottom: false,
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 24.0, top: 10.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.toggle_on, color: Colors.white, size: 28),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppTheme.spaceMd),
               Text(
                 'A quote for your',
-                style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300, fontSize: 20),
+                style: textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w300,
+                ),
               ),
               Text(
                 '$emotionLabel moment',
-                style: textTheme.headlineLarge?.copyWith(fontSize: 34),
+                style: textTheme.headlineLarge,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: GradientButton(
-                  label: 'AI Rewrite',
-                  icon: Icons.auto_awesome,
-                  height: 48,
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.aiRewrite,
-                      arguments: quote.selectedQuote,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceLg),
               Expanded(
-                child: PageView.builder(
-                  itemCount: displayQuotes.length,
-                  physics: const BouncingScrollPhysics(),
-                  controller: _pageController,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(40),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                          child: Container(
-                            padding: const EdgeInsets.all(40),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(40),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 15,
-                                  spreadRadius: 2,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Text(
-                                displayQuotes[index],
-                                textAlign: TextAlign.center,
-                                style: textTheme.bodyLarge?.copyWith(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white,
-                                ),
-                              ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    PageView.builder(
+                      itemCount: displayQuotes.length,
+                      physics: const BouncingScrollPhysics(),
+                      controller: _pageController,
+                      itemBuilder: (context, index) {
+                        return AnimatedBuilder(
+                          animation: _pageController,
+                          builder: (context, child) {
+                            double scale = 1.0;
+                            if (_pageController.position.haveDimensions) {
+                              final page =
+                                  _pageController.page ?? index.toDouble();
+                              scale = (1 - (page - index).abs() * 0.07)
+                                  .clamp(0.9, 1.0);
+                            }
+                            return Transform.scale(scale: scale, child: child);
+                          },
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: _QuoteCard(
+                              quote: displayQuotes[index],
+                              maxHeight: screenHeight * 0.42,
                             ),
                           ),
-                        ),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      left: 4,
+                      child: _CarouselArrow(
+                        icon: Icons.chevron_left,
+                        onTap: _goToPrevious,
                       ),
-                    );
-                  },
+                    ),
+                    Positioned(
+                      right: 4,
+                      child: _CarouselArrow(
+                        icon: Icons.chevron_right,
+                        onTap: _goToNext,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                child: GestureDetector(
-                  onTapDown: (_) => setState(() => isButtonPressed = true),
-                  onTapUp: (_) {
-                    setState(() => isButtonPressed = false);
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  },
-                  onTapCancel: () => setState(() => isButtonPressed = false),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    curve: Curves.easeInOut,
-                    transform: Matrix4.diagonal3Values(
-                      isButtonPressed ? 0.9 : 1.0,
-                      isButtonPressed ? 0.9 : 1.0,
-                      1.0,
-                    ),
-                    alignment: Alignment.center,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(40),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.25),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 10,
-                                spreadRadius: 1,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 32),
-                        ),
-                      ),
-                    ),
-                  ),
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+                child: _AiRewriteButton(
+                  onTap: () => _openAiRewrite(displayQuotes),
                 ),
+              ),
+              const SizedBox(height: AppTheme.spaceSm),
+              AppBottomNavBar(
+                activeTab: BottomNavTab.camera,
+                onDashboard: _goToDashboard,
+                onCamera: _goToCamera,
+                onSettings: _goToSettings,
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuoteCard extends StatelessWidget {
+  final String quote;
+  final double maxHeight;
+
+  const _QuoteCard({required this.quote, required this.maxHeight});
+
+  double _fontSizeFor(String text) {
+    final len = text.length;
+    if (len <= 60) return 15;
+    if (len <= 120) return 14;
+    if (len <= 200) return 13;
+    if (len <= 300) return 12;
+    return 11;
+  }
+
+  EdgeInsets _paddingFor(String text) {
+    final len = text.length;
+    if (len <= 80) {
+      return const EdgeInsets.symmetric(
+        horizontal: AppTheme.spaceXl,
+        vertical: AppTheme.spaceXl,
+      );
+    }
+    return const EdgeInsets.symmetric(
+      horizontal: AppTheme.spaceLg,
+      vertical: AppTheme.spaceLg,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final fontSize = _fontSizeFor(quote);
+    final padding = _paddingFor(quote);
+    final isLong = quote.length > 200;
+
+    final quoteText = Text(
+      quote,
+      textAlign: TextAlign.center,
+      style: textTheme.bodyLarge?.copyWith(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w400,
+        color: AppTheme.quoteText,
+        height: 1.45,
+      ),
+    );
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      constraints: BoxConstraints(
+        maxHeight: maxHeight,
+        maxWidth: 300,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.45),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: isLong
+                ? SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    child: quoteText,
+                  )
+                : quoteText,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AiRewriteButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AiRewriteButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        child: Ink(
+          height: AppTheme.buttonHeight,
+          decoration: BoxDecoration(
+            gradient: AppTheme.buttonGradient,
+            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryPurple.withValues(alpha: 0.35),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
+              const SizedBox(width: AppTheme.spaceXs),
+              Text(
+                'AI Rewrite',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CarouselArrow extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _CarouselArrow({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.2),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.45),
+              ),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
           ),
         ),
       ),

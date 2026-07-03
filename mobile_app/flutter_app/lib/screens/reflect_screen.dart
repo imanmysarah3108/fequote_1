@@ -7,7 +7,10 @@ import '../constants/app_theme.dart';
 import '../providers/reflect_provider.dart';
 import '../providers/quote_provider.dart';
 import '../providers/settings_provider.dart';
+import '../app_routes.dart';
+import '../widgets/app_bottom_nav_bar.dart';
 import 'result_screen.dart';
+import 'settings_screen.dart';
 
 class ReflectScreen extends StatefulWidget {
   const ReflectScreen({super.key});
@@ -20,7 +23,6 @@ class _ReflectScreenState extends State<ReflectScreen> {
   CameraController? _controller;
   List<CameraDescription>? cameras;
   int cameraIndex = 0;
-  bool isPressed = false;
 
   @override
   void initState() {
@@ -73,112 +75,171 @@ class _ReflectScreenState extends State<ReflectScreen> {
     }
   }
 
+  void _goToDashboard() {
+    Navigator.pushNamed(context, AppRoutes.moodDashboard);
+  }
+
+  void _goToSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = context.watch<ReflectProvider>().isLoading;
     final textTheme = Theme.of(context).textTheme;
+    final navHeight = appBottomNavTotalHeight(context);
 
     return Scaffold(
       body: _controller == null || !_controller!.value.isInitialized
           ? Container(
               decoration: AppTheme.backgroundGradient,
-              child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
             )
           : Stack(
               children: [
                 Container(decoration: AppTheme.backgroundGradient),
                 SafeArea(
+                  bottom: false,
                   child: Column(
                     children: [
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 24.0, top: 10.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(30),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.toggle_on, color: Colors.white, size: 28),
-                                  onPressed: _switchCamera,
-                                ),
-                              ),
-                            ),
+                      const SizedBox(height: AppTheme.spaceLg),
+                      Text(
+                        'Moment of Reflection',
+                        style: textTheme.headlineLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppTheme.spaceMd),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl),
+                        child: Text(
+                          'Position your face in the frame.\nRelax and breathe.',
+                          textAlign: TextAlign.center,
+                          style: textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w300,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text('Moment of Reflection', style: textTheme.headlineMedium),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Position your face in the frame.\nRelax and breathe.',
-                        textAlign: TextAlign.center,
-                        style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w300),
-                      ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: AppTheme.spaceMd),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                              child: Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(48),
-                                  child: AspectRatio(
-                                    aspectRatio: 3 / 4,
-                                    child: CameraPreview(_controller!),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          padding: EdgeInsets.fromLTRB(
+                            AppTheme.spaceLg,
+                            0,
+                            AppTheme.spaceLg,
+                            navHeight * 0.12,
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 40),
-                        child: GestureDetector(
-                          onTapDown: (_) => setState(() => isPressed = true),
-                          onTapUp: (_) {
-                            setState(() => isPressed = false);
-                            if (!isLoading) _captureAndSend();
-                          },
-                          onTapCancel: () => setState(() => isPressed = false),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 150),
-                            transform: Matrix4.diagonal3Values(
-                              isPressed ? 0.9 : 1.0,
-                              isPressed ? 0.9 : 1.0,
-                              1.0,
-                            ),
-                            alignment: Alignment.center,
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: 0.25),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
-                            ),
-                            child: const Icon(Icons.camera_alt, color: Colors.white, size: 32),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.center,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(48),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                      child: Container(
+                                        width: double.infinity,
+                                        constraints: BoxConstraints(
+                                          maxHeight: constraints.maxHeight,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(48),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(alpha: 0.45),
+                                            width: 1,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.06),
+                                              blurRadius: 24,
+                                              offset: const Offset(0, 10),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(46),
+                                          child: AspectRatio(
+                                            aspectRatio: 3 / 4,
+                                            child: Stack(
+                                              fit: StackFit.expand,
+                                              children: [
+                                                CameraPreview(_controller!),
+                                                Positioned(
+                                                  right: AppTheme.spaceMd,
+                                                  bottom: AppTheme.spaceMd,
+                                                  child: GestureDetector(
+                                                    onTap: _switchCamera,
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(22),
+                                                      child: BackdropFilter(
+                                                        filter: ImageFilter.blur(
+                                                          sigmaX: 10,
+                                                          sigmaY: 10,
+                                                        ),
+                                                        child: Container(
+                                                          width: 44,
+                                                          height: 44,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white
+                                                                .withValues(alpha: 0.22),
+                                                            shape: BoxShape.circle,
+                                                            border: Border.all(
+                                                              color: Colors.white
+                                                                  .withValues(alpha: 0.5),
+                                                            ),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors.black
+                                                                    .withValues(alpha: 0.1),
+                                                                blurRadius: 8,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: const Icon(
+                                                            Icons.cameraswitch_rounded,
+                                                            color: Colors.white,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ),
                     ],
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: AppBottomNavBar(
+                    activeTab: BottomNavTab.camera,
+                    centerIsCapture: true,
+                    isCaptureLoading: isLoading,
+                    onCapture: _captureAndSend,
+                    onDashboard: _goToDashboard,
+                    onSettings: _goToSettings,
                   ),
                 ),
                 if (isLoading)
@@ -187,7 +248,9 @@ class _ReflectScreenState extends State<ReflectScreen> {
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
                         color: AppTheme.primaryPurple.withValues(alpha: 0.3),
-                        child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+                        child: const Center(
+                          child: CircularProgressIndicator(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),

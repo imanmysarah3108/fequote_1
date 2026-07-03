@@ -1,8 +1,1 @@
-venv/
-__pycache__/
-*.pyc
-.env
-notebooks/
-mobile_app/
-.git
-temp/
+https://fequote-api-155804644015.asia-southeast1.run.app/analyze

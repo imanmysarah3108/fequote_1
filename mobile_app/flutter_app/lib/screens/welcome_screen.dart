@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../constants/app_theme.dart';
-import '../app_routes.dart';
 import 'reflect_screen.dart';
-import 'settings_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -13,160 +11,93 @@ class WelcomeScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background Gradient
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: AppTheme.backgroundGradient,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(flex: 2),
-                    
-                    // UI Match: "Quote" Title
-                    Text(
-                      "Quote",
-                      textAlign: TextAlign.center,
-                      style: textTheme.headlineLarge?.copyWith(
-                        fontSize: 52, // Scaled up to match the reference
-                      ),
-                    ),
-                    
-                    // UI Match: "My Mood" Subtitle
-                    Text(
-                      "My Mood",
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodyLarge?.copyWith(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w300, // Light weight for elegant contrast
-                      ),
-                    ),
-                    
-                    const Spacer(flex: 1),
-
-                    // YOUR CUSTOM BIG LOGO
-                    // Ensure the path matches exactly what is in pubspec.yaml
-                    Image.asset(
-                      'assets/images/app_logo.png',
-                      width: 280, // Large size to match the reference
-                      height: 280,
-                      fit: BoxFit.contain,
-                    ),
-                    
-                    const Spacer(flex: 2),
-
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white.withValues(alpha: 0.15),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 56),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.4),
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.moodDashboard);
-                        },
-                        child: Text(
-                          'My Mood Dashboard',
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Glassmorphic 'Get Started' Button
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 40),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 60),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.4), 
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                        onPressed: () {
-                          // Preserved routing logic
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ReflectScreen(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          "Get Started",
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: AppTheme.backgroundGradient,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl),
+            child: Column(
+              children: [
+                const Spacer(flex: 3),
+                Text(
+                  'Quote',
+                  textAlign: TextAlign.center,
+                  style: textTheme.headlineLarge?.copyWith(fontSize: 48),
                 ),
-              ),
-            ),
-          ),
-
-          // Top Right Settings Button (Glass Pill)
-          Positioned(
-            top: 50, // Standard safe area padding
-            right: 24,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-                  ),
-                  child: IconButton(
-                    // UI Match: Using toggle_on to match your design visually 
-                    // while keeping it functioning as the settings button
-                    icon: const Icon(Icons.toggle_on, color: Colors.white, size: 28),
-                    onPressed: () {
-                      // Preserved routing logic
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
-                        ),
-                      );
-                    },
+                const SizedBox(height: 4),
+                Text(
+                  'My Mood',
+                  textAlign: TextAlign.center,
+                  style: textTheme.bodyLarge?.copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: 0.3,
                   ),
                 ),
-              ),
+                const Spacer(flex: 2),
+                Image.asset(
+                  'assets/images/app_logo.png',
+                  width: 240,
+                  height: 240,
+                  fit: BoxFit.contain,
+                ),
+                const Spacer(flex: 3),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      width: double.infinity,
+                      height: AppTheme.buttonHeight,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.45),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ReflectScreen(),
+                              ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                          child: Center(
+                            child: Text(
+                              'Get Started',
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spaceXl),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

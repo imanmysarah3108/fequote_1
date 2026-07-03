@@ -70,11 +70,11 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
         decoration: AppTheme.backgroundGradient,
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: AppTheme.spaceXs),
                 Row(
                   children: [
                     _GlassIconButton(
@@ -82,25 +82,18 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                       onTap: () => Navigator.pop(context),
                     ),
                     Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.auto_awesome, color: Colors.white70, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            'AI Rewrite',
-                            style: textTheme.headlineMedium?.copyWith(fontSize: 28),
-                          ),
-                        ],
+                      child: Text(
+                        '✦  AI Rewrite',
+                        textAlign: TextAlign.center,
+                        style: textTheme.headlineLarge,
                       ),
                     ),
-                    const SizedBox(width: 50),
+                    const SizedBox(width: 44),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.spaceLg),
                 GlassContainer(
-                  borderRadius: 24,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppTheme.spaceMd),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -109,89 +102,122 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                         children: [
                           Text(
                             'Selected Quote',
-                            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                            style: textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.pop(context),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppTheme.spaceMd,
+                                vertical: AppTheme.spaceXs,
+                              ),
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFF9E8BFF), Color(0xFFFFB09C)],
-                                ),
-                                borderRadius: BorderRadius.circular(20),
+                                gradient: AppTheme.buttonGradient,
+                                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                               ),
                               child: const Text(
                                 'Change',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 13,
+                                  fontSize: AppTheme.labelSize,
                                 ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.spaceMd),
                       Text(
                         vm.originalQuote,
                         style: textTheme.headlineMedium?.copyWith(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
+                          height: 1.4,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  "What's happening today?",
-                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.spaceMd),
                 GlassContainer(
-                  borderRadius: 28,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
+                  padding: const EdgeInsets.all(AppTheme.spaceMd),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _contextController,
-                          onChanged: vm.setContext,
-                          maxLines: 3,
-                          minLines: 1,
-                          style: textTheme.bodyLarge?.copyWith(color: Colors.white),
-                          decoration: InputDecoration(
-                            hintText: 'Type here...',
-                            hintStyle: textTheme.bodyMedium,
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
+                      Text(
+                        "What's happening today?",
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () async {
-                          if (vm.isListening) {
-                            await vm.stopListening();
-                          } else {
-                            await vm.startListening();
-                          }
-                        },
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: vm.isListening
-                                ? AppTheme.primaryPurple.withValues(alpha: 0.5)
-                                : Colors.white.withValues(alpha: 0.15),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-                          ),
-                          child: Icon(
-                            vm.isListening ? Icons.mic : Icons.mic_none,
-                            color: Colors.white,
-                            size: 22,
+                      const SizedBox(height: AppTheme.spaceSm),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppTheme.spaceMd,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _contextController,
+                                    onChanged: vm.setContext,
+                                    maxLines: 3,
+                                    minLines: 1,
+                                    style: textTheme.bodyLarge?.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: 'Type here...',
+                                      hintStyle: textTheme.bodyMedium,
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (vm.isListening) {
+                                      await vm.stopListening();
+                                    } else {
+                                      await vm.startListening();
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: vm.isListening
+                                          ? AppTheme.primaryPurple.withValues(alpha: 0.5)
+                                          : Colors.white.withValues(alpha: 0.15),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: 0.4),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      vm.isListening ? Icons.mic : Icons.mic_none,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -205,28 +231,22 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                     style: textTheme.bodyMedium?.copyWith(color: Colors.red.shade200),
                   ),
                 ],
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.spaceLg),
                 GradientButton(
-                  label: 'Rewrite Quote',
-                  icon: Icons.auto_awesome,
+                  label: '✦  Rewrite Quote',
                   isLoading: vm.isLoading,
                   onPressed: () => vm.rewriteQuote(),
                 ),
-                const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.auto_awesome, color: Colors.white70, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Your Personalized Quote',
-                      style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                const SizedBox(height: AppTheme.spaceXl),
+                Center(
+                  child: Text(
+                    '✦  Your Personalized Quote  ✦',
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
                     ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.auto_awesome, color: Colors.white70, size: 14),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spaceMd),
                 if (vm.hasResult)
                   FadeTransition(
                     opacity: _fadeAnimation,
@@ -241,8 +261,8 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                   )
                 else
                   GlassContainer(
-                    borderRadius: 32,
-                    padding: const EdgeInsets.all(32),
+                    borderRadius: AppTheme.radiusQuoteCard,
+                    padding: const EdgeInsets.all(AppTheme.spaceXl),
                     child: Center(
                       child: Text(
                         'Your personalized quote will appear here.',
@@ -252,10 +272,10 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                     ),
                   ),
                 if (vm.hasResult) ...[
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.spaceMd),
                   GlassContainer(
-                    borderRadius: 28,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    borderRadius: AppTheme.radiusPill,
+                    padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceSm),
                     child: Row(
                       children: [
                         Expanded(
@@ -289,7 +309,7 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                     ),
                   ),
                 ],
-                const SizedBox(height: 32),
+                const SizedBox(height: AppTheme.spaceXl),
               ],
             ),
           ),
@@ -310,8 +330,10 @@ class _ResultCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard),
         gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
             Color(0xFF9E8BFF),
             Color(0xFFFFB09C),
@@ -320,22 +342,28 @@ class _ResultCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryPurple.withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: AppTheme.primaryPurple.withValues(alpha: 0.4),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(3),
+      padding: const EdgeInsets.all(2),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard - 2),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spaceLg,
+              vertical: AppTheme.spaceXl,
+            ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(30),
+              color: Colors.white.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard - 2),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.35),
+              ),
             ),
             child: Stack(
               children: [
@@ -343,23 +371,27 @@ class _ResultCard extends StatelessWidget {
                   top: 0,
                   left: 0,
                   child: Text(
-                    '"',
+                    '\u201C',
                     style: TextStyle(
                       color: Colors.white54,
-                      fontSize: 48,
+                      fontSize: 56,
                       fontWeight: FontWeight.w300,
+                      height: 1,
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppTheme.spaceMd,
+                    horizontal: AppTheme.spaceXs,
+                  ),
                   child: Text(
                     quote,
                     textAlign: TextAlign.center,
-                    style: textTheme.bodyLarge?.copyWith(
+                    style: textTheme.headlineMedium?.copyWith(
                       fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      height: 1.5,
+                      fontWeight: FontWeight.w500,
+                      height: 1.45,
                     ),
                   ),
                 ),
@@ -367,11 +399,12 @@ class _ResultCard extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   child: Text(
-                    '"',
+                    '\u201D',
                     style: TextStyle(
                       color: Colors.white54,
-                      fontSize: 48,
+                      fontSize: 56,
                       fontWeight: FontWeight.w300,
+                      height: 1,
                     ),
                   ),
                 ),
@@ -397,16 +430,17 @@ class _GlassIconButton extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          width: 50,
-          height: 50,
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.2),
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
           ),
           child: IconButton(
-            icon: Icon(icon, color: Colors.white, size: 28),
+            icon: Icon(icon, color: Colors.white, size: 24),
             onPressed: onTap,
+            padding: EdgeInsets.zero,
           ),
         ),
       ),
@@ -438,8 +472,8 @@ class _ActionTile extends StatelessWidget {
             label,
             style: const TextStyle(
               color: Colors.white,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              fontSize: AppTheme.bodySize,
             ),
           ),
         ],
