@@ -119,9 +119,7 @@ class _ReflectScreenState extends State<ReflectScreen> {
                         child: Text(
                           'Position your face in the frame.\nRelax and breathe.',
                           textAlign: TextAlign.center,
-                          style: textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w300,
-                          ),
+                          style: textTheme.bodyMedium,
                         ),
                       ),
                       const SizedBox(height: AppTheme.spaceMd),
@@ -155,13 +153,7 @@ class _ReflectScreenState extends State<ReflectScreen> {
                                             color: Colors.white.withValues(alpha: 0.45),
                                             width: 1,
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.06),
-                                              blurRadius: 24,
-                                              offset: const Offset(0, 10),
-                                            ),
-                                          ],
+                                          boxShadow: AppTheme.cardShadow,
                                         ),
                                         child: ClipRRect(
                                           borderRadius: BorderRadius.circular(46),
@@ -174,19 +166,22 @@ class _ReflectScreenState extends State<ReflectScreen> {
                                                 Positioned(
                                                   right: AppTheme.spaceMd,
                                                   bottom: AppTheme.spaceMd,
-                                                  child: GestureDetector(
+                                                  child: Semantics(
+                                                    button: true,
+                                                    label: 'Switch camera',
+                                                    child: GestureDetector(
                                                     onTap: _switchCamera,
                                                     child: ClipRRect(
                                                       borderRadius:
-                                                          BorderRadius.circular(22),
+                                                          BorderRadius.circular(24),
                                                       child: BackdropFilter(
                                                         filter: ImageFilter.blur(
                                                           sigmaX: 10,
                                                           sigmaY: 10,
                                                         ),
                                                         child: Container(
-                                                          width: 44,
-                                                          height: 44,
+                                                          width: AppTheme.minTapTarget,
+                                                          height: AppTheme.minTapTarget,
                                                           decoration: BoxDecoration(
                                                             color: Colors.white
                                                                 .withValues(alpha: 0.22),
@@ -211,6 +206,7 @@ class _ReflectScreenState extends State<ReflectScreen> {
                                                         ),
                                                       ),
                                                     ),
+                                                  ),
                                                   ),
                                                 ),
                                               ],
@@ -248,8 +244,18 @@ class _ReflectScreenState extends State<ReflectScreen> {
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
                         color: AppTheme.primaryPurple.withValues(alpha: 0.3),
-                        child: const Center(
-                          child: CircularProgressIndicator(color: Colors.white),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const CircularProgressIndicator(color: Colors.white),
+                              const SizedBox(height: AppTheme.spaceMd),
+                              Text(
+                                'Reading your expression…',
+                                style: textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

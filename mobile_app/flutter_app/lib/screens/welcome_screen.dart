@@ -32,7 +32,7 @@ class WelcomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: textTheme.bodyLarge?.copyWith(
                     fontSize: 20,
-                    fontWeight: FontWeight.w300,
+                    fontWeight: FontWeight.w400,
                     letterSpacing: 0.3,
                   ),
                 ),
@@ -58,13 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.45),
                           width: 1,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
+                        boxShadow: AppTheme.cardShadow,
                       ),
                       child: Material(
                         color: Colors.transparent,

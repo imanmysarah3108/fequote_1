@@ -199,9 +199,7 @@ class _MoodDashboardScreenState extends State<MoodDashboardScreen> {
                                   child: Text(
                                     'No mood scans this week yet. Tap the camera to start tracking.',
                                     textAlign: TextAlign.center,
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.w300,
-                                    ),
+                                    style: textTheme.bodyMedium,
                                   ),
                                 ),
                               const SizedBox(height: AppTheme.spaceLg),

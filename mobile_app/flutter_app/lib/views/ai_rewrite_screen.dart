@@ -67,13 +67,22 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
 
     return Scaffold(
       body: Container(
+        // Full-bleed gradient: fill the viewport so short quotes never expose
+        // the Scaffold's black background. The scroll view lives inside and a
+        // minHeight = viewport keeps the background full even when content is
+        // shorter than the screen. Behaviour unchanged — only visuals/layout.
+        width: double.infinity,
+        height: double.infinity,
         decoration: AppTheme.backgroundGradient,
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 const SizedBox(height: AppTheme.spaceXs),
                 Row(
                   children: [
@@ -88,7 +97,7 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                         style: textTheme.headlineLarge,
                       ),
                     ),
-                    const SizedBox(width: 44),
+                    const SizedBox(width: AppTheme.minTapTarget),
                   ],
                 ),
                 const SizedBox(height: AppTheme.spaceLg),
@@ -189,30 +198,36 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                                     ),
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    if (vm.isListening) {
-                                      await vm.stopListening();
-                                    } else {
-                                      await vm.startListening();
-                                    }
-                                  },
-                                  child: Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: vm.isListening
-                                          ? AppTheme.primaryPurple.withValues(alpha: 0.5)
-                                          : Colors.white.withValues(alpha: 0.15),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(alpha: 0.4),
+                                Semantics(
+                                  button: true,
+                                  label: vm.isListening
+                                      ? 'Stop voice input'
+                                      : 'Start voice input',
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      if (vm.isListening) {
+                                        await vm.stopListening();
+                                      } else {
+                                        await vm.startListening();
+                                      }
+                                    },
+                                    child: Container(
+                                      width: AppTheme.minTapTarget,
+                                      height: AppTheme.minTapTarget,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: vm.isListening
+                                            ? AppTheme.primaryPurple.withValues(alpha: 0.5)
+                                            : Colors.white.withValues(alpha: 0.15),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(alpha: 0.4),
+                                        ),
                                       ),
-                                    ),
-                                    child: Icon(
-                                      vm.isListening ? Icons.mic : Icons.mic_none,
-                                      color: Colors.white,
-                                      size: 22,
+                                      child: Icon(
+                                        vm.isListening ? Icons.mic : Icons.mic_none,
+                                        color: Colors.white,
+                                        size: 22,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -266,7 +281,7 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                     child: Center(
                       child: Text(
                         'Your personalized quote will appear here.',
-                        style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w300),
+                        style: textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -287,7 +302,6 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Quote copied to clipboard'),
-                                  backgroundColor: AppTheme.primaryPurple,
                                 ),
                               );
                             },
@@ -310,7 +324,9 @@ class _AIRewriteScreenState extends State<AIRewriteScreen>
                   ),
                 ],
                 const SizedBox(height: AppTheme.spaceXl),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -430,8 +446,8 @@ class _GlassIconButton extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          width: 44,
-          height: 44,
+          width: AppTheme.minTapTarget,
+          height: AppTheme.minTapTarget,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.2),
             shape: BoxShape.circle,
@@ -439,6 +455,7 @@ class _GlassIconButton extends StatelessWidget {
           ),
           child: IconButton(
             icon: Icon(icon, color: Colors.white, size: 24),
+            tooltip: 'Back',
             onPressed: onTap,
             padding: EdgeInsets.zero,
           ),

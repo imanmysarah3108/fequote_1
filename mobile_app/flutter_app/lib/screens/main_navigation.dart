@@ -53,9 +53,9 @@ class MainNavigation extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _navItem(context, Icons.camera_alt_rounded, 0),
-                  _navItem(context, Icons.format_quote_rounded, 1),
-                  _navItem(context, Icons.settings_rounded, 2),
+                  _navItem(context, Icons.camera_alt_rounded, 'Camera', 0),
+                  _navItem(context, Icons.format_quote_rounded, 'Quotes', 1),
+                  _navItem(context, Icons.settings_rounded, 'Settings', 2),
                 ],
               ),
             ),
@@ -65,25 +65,51 @@ class MainNavigation extends StatelessWidget {
     );
   }
 
-  Widget _navItem(BuildContext context, IconData icon, int index) {
+  Widget _navItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    int index,
+  ) {
     final navigation = context.watch<NavigationProvider>();
     final isSelected = navigation.currentIndex == index;
+    final color = isSelected ? Colors.white : Colors.white.withValues(alpha: 0.75);
 
-    return GestureDetector(
-      onTap: () => context.read<NavigationProvider>().setIndex(index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutQuint,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white.withValues(alpha: 0.25) : Colors.transparent,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Icon(
-          icon,
-          color: isSelected ? Colors.white : Colors.white60,
-          size: 28,
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: GestureDetector(
+        onTap: () => context.read<NavigationProvider>().setIndex(index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutQuint,
+          constraints: const BoxConstraints(minHeight: AppTheme.minTapTarget),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spaceMd,
+            vertical: AppTheme.spaceXs,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white.withValues(alpha: 0.25) : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppTheme.radiusNavBar),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(height: AppTheme.space4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: AppTheme.labelSize,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  height: 1.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

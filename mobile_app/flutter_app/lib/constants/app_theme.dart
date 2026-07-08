@@ -34,6 +34,10 @@ class AppTheme {
   /// Secondary/muted text on light surfaces. Still AA (~4.6:1 on white).
   static const Color textOnLightMuted = Color(0xFF6B5E57);
 
+  /// Unselected bottom-nav item colour. Muted but still clearly legible against
+  /// the light nav bar — raises discoverability of inactive tabs (feedback #2).
+  static Color navInactive = quoteText.withValues(alpha: 0.68);
+
   // ---------------------------------------------------------------------------
   // NEW: semantic state colours (loading/empty use neutrals; these are for
   // success / error / warning / info messaging). Tuned for AA on white cards.
@@ -61,6 +65,9 @@ class AppTheme {
     'surprise': Color(0xFFEB8FC0),
     'disgust': Color(0xFF5FA86A),
     'neutral': Color(0xFF9B8FA6),
+    // Provider default before any scan – a calm teal so the initial bubble reads
+    // as its own mood rather than falling back to the brand purple.
+    'peaceful': Color(0xFF4FB0A5),
   };
 
   /// Safe lookup that always returns a valid colour for an emotion label.

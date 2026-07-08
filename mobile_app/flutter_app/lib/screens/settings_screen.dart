@@ -72,9 +72,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       const SizedBox(height: AppTheme.spaceXs),
                                       Text(
                                         'Stay in tune with your mood.',
-                                        style: textTheme.bodyLarge?.copyWith(
-                                          fontWeight: FontWeight.w300,
-                                        ),
+                                        style: textTheme.bodyLarge,
                                       ),
                                     ],
                                   ),
@@ -138,11 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       context.read<SettingsProvider>().toggleNotification(value);
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                          content: Text(
-                                            'Settings saved',
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor: AppTheme.primaryPurple,
+                                          content: Text('Settings saved'),
                                         ),
                                       );
                                     },
@@ -174,22 +168,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ],
                                     ),
                                   ),
-                                  GestureDetector(
+                                  Semantics(
+                                    button: true,
+                                    label: 'Change reminder time, currently $timeString',
+                                    child: GestureDetector(
                                     onTap: () async {
                                       await context.read<SettingsProvider>().pickTime(context);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
-                                            content: Text(
-                                              'Settings saved',
-                                              style: TextStyle(color: Colors.white),
-                                            ),
-                                            backgroundColor: AppTheme.primaryPurple,
+                                            content: Text('Settings saved'),
                                           ),
                                         );
                                       }
                                     },
                                     child: Container(
+                                      constraints: const BoxConstraints(
+                                        minHeight: AppTheme.minTapTarget,
+                                      ),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: AppTheme.spaceSm,
                                         vertical: AppTheme.spaceXs,
@@ -227,6 +223,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ),
                                     ),
                                   ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -261,13 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Colors.white.withValues(alpha: 0.4),
               width: 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            boxShadow: AppTheme.cardShadow,
           ),
           child: child,
         ),

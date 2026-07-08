@@ -62,6 +62,20 @@ async def analyze(
         return {"error": str(e)}
 
 
+@app.get("/quotes")
+def quotes(emotion: str):
+    # Fallback path for manual emotion selection when FER returns
+    # "no emotion detected". Reuses the SAME recommend_quotes() CBF pipeline as
+    # /analyze — no new recommendation logic, just an image-free entry point.
+    try:
+        return {
+            "emotion": emotion,
+            "quotes": recommend_quotes(emotion),
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.get("/mood/weekly")
 def mood_weekly(device_id: str):
     try:

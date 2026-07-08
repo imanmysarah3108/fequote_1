@@ -45,4 +45,26 @@ class ApiService {
       rethrow;
     }
   }
+
+  /// Fetch quotes for a manually selected emotion (fallback when FER returns
+  /// "no emotion detected"). Hits the same CBF recommender as [detectEmotion],
+  /// just without an image. [emotion] must be a real FER label
+  /// (happy / sad / angry / surprise).
+  static Future<List<String>> fetchQuotesByEmotion(String emotion) async {
+    final uri = Uri.parse('$baseUrl/quotes').replace(
+      queryParameters: {'emotion': emotion},
+    );
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+      if (jsonData.containsKey('error')) {
+        throw Exception(jsonData['error'] as String);
+      }
+      return List<String>.from(jsonData['quotes'] as List);
+    }
+
+    throw Exception('Server error: ${response.body}');
+  }
 }

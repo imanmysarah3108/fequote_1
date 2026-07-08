@@ -39,13 +39,7 @@ class GlassContainer extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.4),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: AppTheme.cardShadow,
             ),
             child: child,
           ),

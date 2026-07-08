@@ -98,7 +98,8 @@ class _QuoteScreenState extends State<QuoteScreen> {
     final textTheme = Theme.of(context).textTheme;
     final screenHeight = MediaQuery.sizeOf(context).height;
 
-    final displayQuotes = quote.quotes.isEmpty
+    final bool isPlaceholder = quote.quotes.isEmpty;
+    final displayQuotes = isPlaceholder
         ? ['Your motivational quote will appear here. You are stronger than you think.']
         : quote.quotes;
 
@@ -116,9 +117,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
               const SizedBox(height: AppTheme.spaceMd),
               Text(
                 'A quote for your',
-                style: textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w300,
-                ),
+                style: textTheme.bodyLarge,
               ),
               Text(
                 '$emotionLabel moment',
@@ -152,6 +151,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
                             child: _QuoteCard(
                               quote: displayQuotes[index],
                               maxHeight: screenHeight * 0.42,
+                              isPlaceholder: isPlaceholder,
                             ),
                           ),
                         );
@@ -161,6 +161,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
                       left: 4,
                       child: _CarouselArrow(
                         icon: Icons.chevron_left,
+                        semanticLabel: 'Previous quote',
                         onTap: _goToPrevious,
                       ),
                     ),
@@ -168,6 +169,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
                       right: 4,
                       child: _CarouselArrow(
                         icon: Icons.chevron_right,
+                        semanticLabel: 'Next quote',
                         onTap: _goToNext,
                       ),
                     ),
@@ -198,8 +200,13 @@ class _QuoteScreenState extends State<QuoteScreen> {
 class _QuoteCard extends StatelessWidget {
   final String quote;
   final double maxHeight;
+  final bool isPlaceholder;
 
-  const _QuoteCard({required this.quote, required this.maxHeight});
+  const _QuoteCard({
+    required this.quote,
+    required this.maxHeight,
+    this.isPlaceholder = false,
+  });
 
   double _fontSizeFor(String text) {
     final len = text.length;
@@ -231,16 +238,39 @@ class _QuoteCard extends StatelessWidget {
     final padding = _paddingFor(quote);
     final isLong = quote.length > 200;
 
-    final quoteText = Text(
-      quote,
-      textAlign: TextAlign.center,
-      style: textTheme.bodyLarge?.copyWith(
-        fontSize: fontSize,
-        fontWeight: FontWeight.w400,
-        color: AppTheme.quoteText,
-        height: 1.45,
-      ),
-    );
+    final Widget quoteText = isPlaceholder
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.format_quote_rounded,
+                size: 40,
+                color: AppTheme.quoteText.withValues(alpha: 0.4),
+              ),
+              const SizedBox(height: AppTheme.spaceSm),
+              Text(
+                quote,
+                textAlign: TextAlign.center,
+                style: textTheme.bodyLarge?.copyWith(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic,
+                  color: AppTheme.quoteText.withValues(alpha: 0.75),
+                  height: 1.45,
+                ),
+              ),
+            ],
+          )
+        : Text(
+            quote,
+            textAlign: TextAlign.center,
+            style: textTheme.bodyLarge?.copyWith(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w400,
+              color: AppTheme.quoteText,
+              height: 1.45,
+            ),
+          );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -261,13 +291,7 @@ class _QuoteCard extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.45),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+              boxShadow: AppTheme.cardShadow,
             ),
             child: isLong
                 ? SingleChildScrollView(
@@ -329,29 +353,38 @@ class _AiRewriteButton extends StatelessWidget {
 
 class _CarouselArrow extends StatelessWidget {
   final IconData icon;
+  final String semanticLabel;
   final VoidCallback onTap;
 
-  const _CarouselArrow({required this.icon, required this.onTap});
+  const _CarouselArrow({
+    required this.icon,
+    required this.semanticLabel,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.2),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.45),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              width: AppTheme.minTapTarget,
+              height: AppTheme.minTapTarget,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.2),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.45),
+                ),
               ),
+              child: Icon(icon, color: Colors.white, size: 24),
             ),
-            child: Icon(icon, color: Colors.white, size: 24),
           ),
         ),
       ),
