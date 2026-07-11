@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import '../models/recommended_quote.dart';
 
 class ApiService {
   static const String baseUrl =
@@ -36,7 +37,9 @@ class ApiService {
         return {
           'emotion': jsonData['emotion'],
           'confidence': (jsonData['confidence'] as num?)?.toDouble() ?? 0.0,
-          'quotes': List<String>.from(jsonData['quotes'] as List),
+          'quotes': (jsonData['quotes'] as List)
+              .map(RecommendedQuote.fromJson)
+              .toList(),
         };
       }
 
@@ -50,7 +53,9 @@ class ApiService {
   /// "no emotion detected"). Hits the same CBF recommender as [detectEmotion],
   /// just without an image. [emotion] must be a real FER label
   /// (happy / sad / angry / surprise).
-  static Future<List<String>> fetchQuotesByEmotion(String emotion) async {
+  static Future<List<RecommendedQuote>> fetchQuotesByEmotion(
+    String emotion,
+  ) async {
     final uri = Uri.parse('$baseUrl/quotes').replace(
       queryParameters: {'emotion': emotion},
     );
@@ -62,7 +67,9 @@ class ApiService {
       if (jsonData.containsKey('error')) {
         throw Exception(jsonData['error'] as String);
       }
-      return List<String>.from(jsonData['quotes'] as List);
+      return (jsonData['quotes'] as List)
+          .map(RecommendedQuote.fromJson)
+          .toList();
     }
 
     throw Exception('Server error: ${response.body}');

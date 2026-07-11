@@ -39,7 +39,9 @@ def recommend_quotes(emotion, top_n=5):
         return ["No quotes found"]
 
     filtered_embeddings = embeddings[indices]
-    filtered_quotes = data.iloc[indices]['quote'].tolist()
+    filtered_rows = data.iloc[indices]
+    filtered_quotes = filtered_rows['quote'].tolist()
+    filtered_authors = filtered_rows['author'].tolist()
 
     # Encode query
     query_embedding = model.encode([emotion])
@@ -49,9 +51,17 @@ def recommend_quotes(emotion, top_n=5):
 
     ranked_indices = scores[0].argsort()[::-1]
 
-    # Take top 10 ranked quotes
+    # Take top 10 ranked quotes (quote + author, ranking/sampling unchanged)
     top_pool_size = min(10, len(filtered_quotes))
-    top_pool = [filtered_quotes[i] for i in ranked_indices[:top_pool_size]]
+    top_pool = [
+        {
+            "quote": filtered_quotes[i],
+            # Coerce missing authors (NaN) to None so the payload stays
+            # JSON-serialisable; the client hides the line when it's absent.
+            "author": None if pd.isna(filtered_authors[i]) else str(filtered_authors[i]),
+        }
+        for i in ranked_indices[:top_pool_size]
+    ]
 
     # Randomly select final quotes
     selected_quotes = random.sample(top_pool, min(top_n, len(top_pool)))

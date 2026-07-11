@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import '../models/recommended_quote.dart';
 import '../services/api_service.dart';
 import '../services/emotion_history_service.dart';
 import 'quote_provider.dart';
@@ -45,7 +46,7 @@ class ReflectProvider extends ChangeNotifier {
   void updateQuoteFromResult(QuoteProvider quoteProvider, Map<String, dynamic> result) {
     quoteProvider.setResult(
       emotion: result['emotion'] as String,
-      quotes: List<String>.from(result['quotes'] as List),
+      quotes: (result['quotes'] as List).cast<RecommendedQuote>(),
     );
   }
 }

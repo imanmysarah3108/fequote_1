@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../models/recommended_quote.dart';
 
 /// Sentinel the FER backend returns when it cannot confidently read a face.
 /// The confidence threshold itself is decided server-side (Gemini) — this
@@ -13,11 +14,11 @@ const String kNoQuotesSentinel = 'No quotes found';
 
 class QuoteProvider extends ChangeNotifier {
   String _emotion = 'Peaceful';
-  List<String> _quotes = [];
+  List<RecommendedQuote> _quotes = [];
   int _selectedQuoteIndex = 0;
 
   String get emotion => _emotion;
-  List<String> get quotes => List.unmodifiable(_quotes);
+  List<RecommendedQuote> get quotes => List.unmodifiable(_quotes);
   int get selectedQuoteIndex => _selectedQuoteIndex;
 
   /// True when FER could not read the expression. Consumers branch to the
@@ -29,15 +30,18 @@ class QuoteProvider extends ChangeNotifier {
     if (_quotes.isEmpty) {
       return 'Your motivational quote will appear here. You are stronger than you think.';
     }
-    return _quotes[_selectedQuoteIndex.clamp(0, _quotes.length - 1)];
+    return _quotes[_selectedQuoteIndex.clamp(0, _quotes.length - 1)].text;
   }
 
-  void setResult({required String emotion, required List<String> quotes}) {
+  void setResult({
+    required String emotion,
+    required List<RecommendedQuote> quotes,
+  }) {
     _emotion = emotion;
     // Drop the recommender's "No quotes found" sentinel so it never renders as
     // a real quote; an empty list drives the proper placeholder/empty state.
-    final normalised = List<String>.from(quotes);
-    if (normalised.length == 1 && normalised.first == kNoQuotesSentinel) {
+    final normalised = List<RecommendedQuote>.from(quotes);
+    if (normalised.length == 1 && normalised.first.text == kNoQuotesSentinel) {
       normalised.clear();
     }
     _quotes = normalised;

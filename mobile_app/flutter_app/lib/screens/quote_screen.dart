@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_theme.dart';
+import '../models/recommended_quote.dart';
 import '../providers/quote_provider.dart';
 import '../app_routes.dart';
 import '../widgets/app_bottom_nav_bar.dart';
@@ -76,11 +77,12 @@ class _QuoteScreenState extends State<QuoteScreen> {
     );
   }
 
-  void _openAiRewrite(List<String> quotes) {
+  void _openAiRewrite(List<RecommendedQuote> quotes) {
     Navigator.pushNamed(
       context,
       AppRoutes.aiRewrite,
-      arguments: quotes[_currentIndex],
+      // Rewrite operates on the quote text only — author is not sent.
+      arguments: quotes[_currentIndex].text,
     );
   }
 
@@ -98,8 +100,13 @@ class _QuoteScreenState extends State<QuoteScreen> {
     final screenHeight = MediaQuery.sizeOf(context).height;
 
     final bool isPlaceholder = quote.quotes.isEmpty;
-    final displayQuotes = isPlaceholder
-        ? ['Your motivational quote will appear here. You are stronger than you think.']
+    final List<RecommendedQuote> displayQuotes = isPlaceholder
+        ? const [
+            RecommendedQuote(
+              text:
+                  'Your motivational quote will appear here. You are stronger than you think.',
+            ),
+          ]
         : quote.quotes;
 
     final emotionLabel =
@@ -150,7 +157,7 @@ class _QuoteScreenState extends State<QuoteScreen> {
                           child: Align(
                             alignment: Alignment.center,
                             child: _QuoteCard(
-                              quote: displayQuotes[index],
+                              item: displayQuotes[index],
                               height: screenHeight * 0.40,
                               accentColor: accentColor,
                               isPlaceholder: isPlaceholder,
@@ -208,13 +215,13 @@ class _QuoteScreenState extends State<QuoteScreen> {
 }
 
 class _QuoteCard extends StatelessWidget {
-  final String quote;
+  final RecommendedQuote item;
   final double height;
   final Color accentColor;
   final bool isPlaceholder;
 
   const _QuoteCard({
-    required this.quote,
+    required this.item,
     required this.height,
     required this.accentColor,
     this.isPlaceholder = false,
@@ -246,13 +253,14 @@ class _QuoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final fontSize = _fontSizeFor(quote);
-    final padding = _paddingFor(quote);
-    final isLong = quote.length > 200;
+    final text = item.text;
+    final fontSize = _fontSizeFor(text);
+    final padding = _paddingFor(text);
+    final isLong = text.length > 200;
 
     final Widget quoteText = isPlaceholder
         ? Text(
-            quote,
+            text,
             textAlign: TextAlign.center,
             style: textTheme.bodyLarge?.copyWith(
               fontSize: fontSize,
@@ -263,7 +271,7 @@ class _QuoteCard extends StatelessWidget {
             ),
           )
         : Text(
-            quote,
+            text,
             textAlign: TextAlign.center,
             style: textTheme.bodyLarge?.copyWith(
               fontSize: fontSize,
@@ -281,6 +289,22 @@ class _QuoteCard extends StatelessWidget {
       color: accentColor.withValues(alpha: isPlaceholder ? 0.5 : 0.9),
     );
 
+    // Attribution — shown only when the recommender supplied an author.
+    final Widget? authorLine = item.hasAuthor
+        ? Padding(
+            padding: const EdgeInsets.only(top: AppTheme.spaceSm),
+            child: Text(
+              '— ${item.author}',
+              textAlign: TextAlign.center,
+              style: textTheme.bodyMedium?.copyWith(
+                fontSize: AppTheme.captionSize,
+                fontWeight: FontWeight.w600,
+                color: accentColor.withValues(alpha: 0.9),
+              ),
+            ),
+          )
+        : null;
+
     final Widget cardBody = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -294,6 +318,7 @@ class _QuoteCard extends StatelessWidget {
                 )
               : quoteText,
         ),
+        ?authorLine,
       ],
     );
 
