@@ -27,6 +27,13 @@ print("Dataset loaded:", len(df))
 # LOAD NRC LEXICON
 # =========================
 
+# NOTE: NRC-Emotion-Lexicon-Wordlevel-v0.92.txt is NOT tracked in git (its
+# license asks users to obtain it directly from the NRC site, and the app's
+# final dataset is already committed). To re-run this offline scoring script,
+# download the lexicon from
+# https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm
+# and place the .txt file in this dataset/ folder.
+
 nrc = pd.read_csv(
     "NRC-Emotion-Lexicon-Wordlevel-v0.92.txt",
     sep="\t",

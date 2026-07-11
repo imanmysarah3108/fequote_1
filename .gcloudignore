@@ -6,3 +6,4 @@ notebooks/
 mobile_app/
 .git
 temp/
+dataset/NRC-Emotion-Lexicon-Wordlevel-v0.92.txt

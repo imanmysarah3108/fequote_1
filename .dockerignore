@@ -1,1 +1,9 @@
-https://fequote-api-155804644015.asia-southeast1.run.app/analyze
+venv/
+__pycache__/
+*.pyc
+.env
+.git
+notebooks/
+mobile_app/
+temp/
+dataset/NRC-Emotion-Lexicon-Wordlevel-v0.92.txt
