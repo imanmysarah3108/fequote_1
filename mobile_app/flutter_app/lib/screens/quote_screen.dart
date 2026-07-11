@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:ui';
 import '../constants/app_theme.dart';
 import '../providers/quote_provider.dart';
 import '../app_routes.dart';
@@ -106,6 +105,8 @@ class _QuoteScreenState extends State<QuoteScreen> {
     final emotionLabel =
         '${quote.emotion[0].toUpperCase()}${quote.emotion.substring(1)}';
 
+    final accentColor = AppTheme.emotionColor(quote.emotion);
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -150,7 +151,8 @@ class _QuoteScreenState extends State<QuoteScreen> {
                             alignment: Alignment.center,
                             child: _QuoteCard(
                               quote: displayQuotes[index],
-                              maxHeight: screenHeight * 0.42,
+                              height: screenHeight * 0.40,
+                              accentColor: accentColor,
                               isPlaceholder: isPlaceholder,
                             ),
                           ),
@@ -176,6 +178,14 @@ class _QuoteScreenState extends State<QuoteScreen> {
                   ],
                 ),
               ),
+              if (!isPlaceholder && displayQuotes.length > 1) ...[
+                _PageDots(
+                  count: displayQuotes.length,
+                  activeIndex: _currentIndex,
+                  activeColor: accentColor,
+                ),
+                const SizedBox(height: AppTheme.spaceMd),
+              ],
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
                 child: _AiRewriteButton(
@@ -199,12 +209,14 @@ class _QuoteScreenState extends State<QuoteScreen> {
 
 class _QuoteCard extends StatelessWidget {
   final String quote;
-  final double maxHeight;
+  final double height;
+  final Color accentColor;
   final bool isPlaceholder;
 
   const _QuoteCard({
     required this.quote,
-    required this.maxHeight,
+    required this.height,
+    required this.accentColor,
     this.isPlaceholder = false,
   });
 
@@ -239,27 +251,16 @@ class _QuoteCard extends StatelessWidget {
     final isLong = quote.length > 200;
 
     final Widget quoteText = isPlaceholder
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.format_quote_rounded,
-                size: 40,
-                color: AppTheme.quoteText.withValues(alpha: 0.4),
-              ),
-              const SizedBox(height: AppTheme.spaceSm),
-              Text(
-                quote,
-                textAlign: TextAlign.center,
-                style: textTheme.bodyLarge?.copyWith(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w400,
-                  fontStyle: FontStyle.italic,
-                  color: AppTheme.quoteText.withValues(alpha: 0.75),
-                  height: 1.45,
-                ),
-              ),
-            ],
+        ? Text(
+            quote,
+            textAlign: TextAlign.center,
+            style: textTheme.bodyLarge?.copyWith(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w400,
+              fontStyle: FontStyle.italic,
+              color: AppTheme.quoteText.withValues(alpha: 0.75),
+              height: 1.45,
+            ),
           )
         : Text(
             quote,
@@ -272,36 +273,48 @@ class _QuoteCard extends StatelessWidget {
             ),
           );
 
+    // The already-detected emotion, surfaced as a coloured quote-mark accent
+    // (display only — never touches FER/CBF/NRC).
+    final Widget accent = Icon(
+      Icons.format_quote_rounded,
+      size: 32,
+      color: accentColor.withValues(alpha: isPlaceholder ? 0.5 : 0.9),
+    );
+
+    final Widget cardBody = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        accent,
+        const SizedBox(height: AppTheme.spaceSm),
+        Flexible(
+          child: isLong
+              ? SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: quoteText,
+                )
+              : quoteText,
+        ),
+      ],
+    );
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      constraints: BoxConstraints(
-        maxHeight: maxHeight,
-        maxWidth: 300,
-      ),
-      child: ClipRRect(
+      height: height,
+      constraints: const BoxConstraints(maxWidth: 300),
+      padding: padding,
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(AppTheme.radiusQuoteCard),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.45),
-                width: 1,
-              ),
-              boxShadow: AppTheme.cardShadow,
-            ),
-            child: isLong
-                ? SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    child: quoteText,
-                  )
-                : quoteText,
+        boxShadow: [
+          ...AppTheme.cardShadow,
+          BoxShadow(
+            color: AppTheme.primaryPurple.withValues(alpha: 0.10),
+            blurRadius: 30,
+            offset: const Offset(0, 12),
           ),
-        ),
+        ],
       ),
+      child: cardBody,
     );
   }
 }
@@ -369,25 +382,52 @@ class _CarouselArrow extends StatelessWidget {
       label: semanticLabel,
       child: GestureDetector(
         onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              width: AppTheme.minTapTarget,
-              height: AppTheme.minTapTarget,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.2),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.45),
-                ),
-              ),
-              child: Icon(icon, color: Colors.white, size: 24),
-            ),
+        child: Container(
+          width: AppTheme.minTapTarget,
+          height: AppTheme.minTapTarget,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+            boxShadow: AppTheme.cardShadow,
           ),
+          child: Icon(icon, color: AppTheme.quoteText, size: 24),
         ),
       ),
+    );
+  }
+}
+
+class _PageDots extends StatelessWidget {
+  final int count;
+  final int activeIndex;
+  final Color activeColor;
+
+  const _PageDots({
+    required this.count,
+    required this.activeIndex,
+    required this.activeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(count, (index) {
+        final bool isActive = index == activeIndex;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: isActive ? 20 : 7,
+          height: 7,
+          decoration: BoxDecoration(
+            color: isActive
+                ? activeColor
+                : AppTheme.quoteText.withValues(alpha: 0.25),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        );
+      }),
     );
   }
 }
