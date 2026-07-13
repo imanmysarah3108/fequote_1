@@ -1,0 +1,30 @@
+============================================================
+COHEN'S KAPPA: NRC SCORING vs EXPERT REVIEW
+============================================================
+Ambiguous quotes analysed (n) : 811
+Emotion classes               : ['happy', 'sad', 'angry', 'surprise']
+
+Observed (raw) agreement      : 0.7670  (76.70%)
+Cohen's Kappa (k)             : 0.4692
+Landis & Koch interpretation  : Moderate (0.41-0.60)
+
+------------------------------------------------------------
+Label distribution (NRC vs Expert)
+------------------------------------------------------------
+          NRC  Expert  Change
+happy     621     555     -66
+sad       133     162      29
+angry      34      54      20
+surprise   23      40      17
+
+------------------------------------------------------------
+Confusion matrix (rows = NRC label, cols = Expert label)
+------------------------------------------------------------
+              Exp_happy  Exp_sad  Exp_angry  Exp_surprise
+NRC_happy           505       70         29            17
+NRC_sad              35       85          6             7
+NRC_angry             7        5         19             3
+NRC_surprise          8        2          0            13
+
+On-diagonal (NRC = Expert)    : 622
+Off-diagonal (relabelled)     : 189
