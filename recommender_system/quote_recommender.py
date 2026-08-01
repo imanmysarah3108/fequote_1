@@ -30,7 +30,7 @@ def load_resources():
         model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
-def recommend_quotes(emotion, top_n=5):
+def recommend_quotes(emotion, top_n=5, deterministic=False, seed=None):
     load_resources()
     # Filter indices based on emotion
     indices = data[data['emotion'] == emotion].index.tolist()
@@ -63,7 +63,15 @@ def recommend_quotes(emotion, top_n=5):
         for i in ranked_indices[:top_pool_size]
     ]
 
-    # Randomly select final quotes
-    selected_quotes = random.sample(top_pool, min(top_n, len(top_pool)))
+    # Deterministic grading path: return the ranked pool as-is, no sampling.
+    # Used by the offline evaluation to regenerate a stable ranking to grade.
+    if deterministic:
+        return top_pool[:top_n]
+
+    # Randomly select final quotes. `seed=None` uses the shared `random` module
+    # (identical to the original behaviour for the live app); a supplied seed
+    # gives a reproducible sample for evaluation without touching global state.
+    rng = random.Random(seed) if seed is not None else random
+    selected_quotes = rng.sample(top_pool, min(top_n, len(top_pool)))
 
     return selected_quotes

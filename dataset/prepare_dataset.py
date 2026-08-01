@@ -16,7 +16,7 @@ print("Original dataset size:", len(df))
 # KEEP IMPORTANT COLUMNS
 # =========================
 
-# Keep only quote and tags columns
+# Keep only quote and author columns
 df = df[['quote', 'author']]
 
 # =========================

@@ -4,8 +4,7 @@ Ambiguous motivational quotes labelled with a dominant emotion (n = 811).
 
 NRC label      = 'Emotion' column (NRC dominant emotion, mapped to 4-class scheme)
 Expert label   = NRC label where expert Agreed;
-                 'Suggested Emotion' where expert Disagreed;
-                 'happy' for the 2 resolved rows with blank suggestion.
+                 'Suggested Emotion' where expert Disagreed.
 """
 
 import pandas as pd
@@ -24,10 +23,12 @@ def expert_label(row):
     agree = str(row["Expert Agreemment"]).strip().lower()
     if agree == "agree":
         return row["nrc_label"]
-    # Disagree -> use suggested emotion; blank suggestion -> resolved as 'happy'
+    # Disagree -> use the expert's suggested emotion
     sugg = row["Suggested Emotion"]
     if pd.isna(sugg) or str(sugg).strip() == "":
-        return "happy"
+        raise ValueError(
+            f"Row {row.name}: expert Disagreed but 'Suggested Emotion' is blank."
+        )
     return str(sugg).strip().lower()
 
 df["expert_label"] = df.apply(expert_label, axis=1)
